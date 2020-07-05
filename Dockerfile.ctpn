@@ -42,7 +42,7 @@ ARG python_version
 
 ENV PYTHON_VERSION=${python_version}
 
-COPY --from=nvcaffe /opt/install /opt/install
+COPY --from=ctpn-env /opt/install /opt/install
 
 # Copy models 
 COPY ./models /models
