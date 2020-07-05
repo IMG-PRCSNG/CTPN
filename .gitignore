@@ -5,3 +5,6 @@
 results
 *.xml
 
+*~
+.*~
+*.sw*

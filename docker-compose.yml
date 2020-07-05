@@ -1,0 +1,27 @@
+version: '2.3'
+
+services:
+  ctpn:
+      working_dir: /ctpn
+      command: ["/bin/bash", "-c", "/bin/bash build.sh; exec /bin/bash", ]
+      stdin_open: true
+      init: true
+      tty: true
+      environment:
+      - LC_ALL=C.UTF-8
+
+      build:
+          context: .
+          dockerfile: Dockerfile.ctpn
+          target: ctpn-${STAGE:-package}
+          args:
+              - python_version_prefix=3
+              - python_version=3.6
+          cache_from:
+            - docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest
+            - ${REGISTRY}/ctpn-env:latest
+            - ${REGISTRY}/ctpn-dev:latest
+            - ${REGISTRY}/ctpn-package:latest
+            
+
+      image: ${REGISTRY}/ctpn-${STAGE:-package}:${VERSION:-latest}

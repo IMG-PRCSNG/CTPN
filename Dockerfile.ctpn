@@ -1,0 +1,60 @@
+ARG python_version_prefix=3
+ARG python_version=3.6
+
+FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-env
+
+ARG python_version_prefix
+ARG python_version
+
+ENV PYTHON_VERSION=${python_version}
+
+RUN buildDeps="build-essential \
+               curl \
+               make \
+               pkg-config \
+               python${python_version_prefix}-distutils \
+               python${python_version}-dev" && \
+    rm -f /etc/apt/sources.list.d/cuda.list /etc/apt/sources.list.d/nvidia-ml.list && \
+    apt-get -yqq update && \
+    apt-get install -yq --no-install-recommends ${buildDeps} && \
+    curl 'https://bootstrap.pypa.io/get-pip.py' | python${python_version} && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /scratch
+COPY ./requirements.txt ./build-requirements.txt ./
+RUN for req in $(cat requirements.txt ./build-requirements.txt); do pip${PYTHON_VERSION} install --no-cache-dir $req; done
+
+FROM ctpn-env as ctpn-dev
+
+WORKDIR /ctpn
+COPY ./Makefile . 
+COPY ./src/utils/ ./src/utils/
+RUN make -j$(nproc)
+COPY ./src ./src
+ENV PYTHONPATH=/ctpn/src:$PYTHONPATH
+
+FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-package
+
+ARG python_version_prefix
+ARG python_version
+
+ENV PYTHON_VERSION=${python_version}
+
+COPY --from=ctpn-env /opt/install /opt/install
+
+# Copy models 
+COPY ./models /models
+
+# Python dependencies
+COPY ./requirements.txt .
+RUN for req in $(cat requirements.txt); do pip${PYTHON_VERSION} install --no-cache-dir $req; done
+
+# Copy built files
+COPY --from=ctpn-dev /ctpn /ctpn
+
+# Set env
+ENV PYTHONPATH=/ctpn/ctpn/src:$PYTHONPATH
+
+WORKDIR /ctpn
