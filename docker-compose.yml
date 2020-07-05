@@ -20,7 +20,7 @@ services:
               - python_version_full=3.6.9
           cache_from:
             - docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest
-            - ${REGISTRY}/ctpn-env:latest
+            - ${REGISTRY}/ctpn-dev:latest
             - ${REGISTRY}/ctpn-package:latest
             
 

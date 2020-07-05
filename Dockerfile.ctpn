@@ -2,7 +2,7 @@ ARG python_version_prefix
 ARG python_version
 ARG python_version_full
 
-FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-env
+FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-dev
 
 ENV PYTHON_VERSION=${python_version}
 
