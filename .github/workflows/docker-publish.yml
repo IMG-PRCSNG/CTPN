@@ -37,6 +37,7 @@ jobs:
 
       - name: Build package
         run: |
+          docker pull docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest
           STAGE=env docker-compose pull -q || true
           STAGE=dev docker-compose pull -q || true
           docker-compose pull -q || true
@@ -60,6 +61,7 @@ jobs:
       - name: Pull other images
         run: |
           # Pull other images to act as cache
+          docker pull docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest
           STAGE=env docker-compose pull -q || true
           STAGE=dev docker-compose pull -q || true
           docker-compose pull -q || true
