@@ -71,7 +71,11 @@ jobs:
         if: "${{ endsWith(github.ref, 'master') }}"
         run: |
           export REGISTRY=$(echo $REGISTRY | tr '[A-Z]' '[a-z]')
-          
+ 
+          STAGE=env docker-compose config
+          STAGE=env docker-compose build --build-arg BUILDKIT_INLINE_CACHE=1
+          STAGE=env docker-compose push         
+
           STAGE=dev docker-compose config
           STAGE=dev docker-compose build --build-arg BUILDKIT_INLINE_CACHE=1
           STAGE=dev docker-compose push

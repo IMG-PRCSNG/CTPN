@@ -1,12 +1,12 @@
+FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-env
+
 ARG python_version_prefix
 ARG python_version
-ARG python_version_full
-
-FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-dev
 
 ENV PYTHON_VERSION=${python_version}
 
 RUN buildDeps="build-essential \
+               curl \
                make \
                pkg-config \
                python${python_version_prefix}-distutils \
@@ -19,13 +19,22 @@ RUN buildDeps="build-essential \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/*
 
+WORKDIR /scratch
+COPY ./requirements.txt ./build-requirements.txt ./
+RUN for req in $(cat requirements.txt ./build-requirements.txt); do pip${PYTHON_VERSION} install --no-cache-dir $req; done
+
+FROM ctpn-env as ctpn-dev
+
 WORKDIR /ctpn
-COPY ./Makefile ./build.sh ./requirements.txt ./build-requirements.txt ./
+COPY ./Makefile . 
 COPY ./src/utils/ ./src/utils/
-RUN /bin/bash build.sh
+RUN make -j$(nproc)
 COPY ./src ./src
+ENV PYTHONPATH=/ctpn/src:$PYTHONPATH
 
 FROM docker.pkg.github.com/img-prcsng/caffe/nvcaffe-package:latest as ctpn-package
+
+COPY --from=nvcaffe /opt/install /opt/install
 
 # Copy models 
 COPY ./models /models
