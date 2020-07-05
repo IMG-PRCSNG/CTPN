@@ -32,9 +32,15 @@ jobs:
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
+      - name: export registry as env var
+        run: echo "::set-env name=REGISTRY::$(echo $REGISTRY | tr '[A-Z]' '[a-z]')"
+
       - name: Build package
         run: |
-          export REGISTRY=$(echo $REGISTRY | tr '[A-Z]' '[a-z]') 
+          STAGE=env docker-compose pull -q || true
+          STAGE=dev docker-compose pull -q || true
+          docker-compose pull -q || true
+ 
           docker-compose config
           docker-compose build --build-arg BUILDKIT_INLINE_CACHE=1
           
@@ -44,14 +50,22 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v2
+
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
+      - name: export registry as env var
+        run: echo "::set-env name=REGISTRY::$(echo $REGISTRY | tr '[A-Z]' '[a-z]')"
+
+      - name: Pull other images
+        run: |
+          # Pull other images to act as cache
+          STAGE=env docker-compose pull -q || true
+          STAGE=dev docker-compose pull -q || true
+          docker-compose pull -q || true
+ 
       - name: Build image
         run: |
-          # Change all uppercase to lowercase
-          export REGISTRY=$(echo $REGISTRY | tr '[A-Z]' '[a-z]')
-            
           # Strip git ref prefix from version
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 

@@ -25,5 +25,3 @@ services:
             
 
       image: ${REGISTRY}/ctpn-${STAGE:-package}:${VERSION:-latest}
-      volumes:
-        - .:/ctpn
