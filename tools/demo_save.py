@@ -52,7 +52,7 @@ for im_name in demo_imnames:
             wait=False)
 
     if not IS_CV_DISPLAY:
-        cv2.imwrite(f'{args.output_dir}/output_{im_file}', im_with_text_lines)
+        cv2.imwrite(f'{args.output_dir}/output_{im_name}', im_with_text_lines)
 
 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 if IS_CV_DISPLAY:
