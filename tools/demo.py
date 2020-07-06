@@ -43,8 +43,8 @@ demo_imnames=os.listdir(DEMO_IMAGE_DIR)
 timer=Timer()
 
 for im_name in demo_imnames:
-    print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    print "Image: %s"%im_name
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print("Image: %s"%im_name)
 
     im_file=osp.join(DEMO_IMAGE_DIR, im_name)
     im=cv2.imread(im_file)
@@ -54,12 +54,12 @@ for im_name in demo_imnames:
     im, f=resize_im(im, cfg.SCALE, cfg.MAX_SCALE)
     text_lines=text_detector.detect(im)
 
-    print "Number of the detected text lines: %s"%len(text_lines)
-    print "Time: %f"%timer.toc()
+    print("Number of the detected text lines: %s"%len(text_lines))
+    print("Time: %f"%timer.toc())
 
     im_with_text_lines=draw_boxes(im, text_lines, caption=im_name, wait=False)
 
-print "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-print "Thank you for trying our demo. Press any key to exit..."
+print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+print("Thank you for trying our demo. Press any key to exit...")
 cv2.waitKey(0)
 

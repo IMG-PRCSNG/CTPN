@@ -66,7 +66,7 @@ class Graph:
 
     def sub_graphs_connected(self):
         sub_graphs=[]
-        for index in xrange(self.graph.shape[0]):
+        for index in range(self.graph.shape[0]):
             if not self.graph[:, index].any() and self.graph[index, :].any():
                 v=index
                 sub_graphs.append([v])
@@ -88,7 +88,7 @@ class CaffeModel:
         return self.forward2({"data": input_data[np.newaxis, :]})
 
     def forward2(self, input_data):
-        for k, v in input_data.items():
+        for k, v in list(input_data.items()):
             self.net.blobs[k].reshape(*v.shape)
             self.net.blobs[k].data[...]=v
         return self.net.forward()
